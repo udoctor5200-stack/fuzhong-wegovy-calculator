@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週纖達減重費用計算器</title>
+<meta name="description" content="週纖達減重療程費用試算工具，可依體重目標、施打方式、購買盒數與儲值方案快速估算總費用。">
+<meta property="og:title" content="週纖達減重費用計算器">
+<meta property="og:description" content="輸入目標體重，自動推薦週纖達療程盒數、施打方式與儲值方案，分享連結可還原同一組試算數字。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#01696f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --bg:#f7f6f2;--surface:#f9f8f5;--surface2:#fbfbf9;
+  --surface-off:#f3f0ec;--surface-dyn:#e6e4df;
+  --border:#d4d1ca;--divider:#dcd9d5;
+  --text:#28251d;--muted:#7a7974;--faint:#bab9b4;
+  --primary:#01696f;--primary-h:#0c4e54;--primary-hl:#cedcd8;
+  --success:#437a22;--success-hl:#d4dfcc;
+  --gold:#b07a00;--gold-hl:#f0e4b8;--gold-bright:#d19900;
+  --purple:#5a2d91;--purple-hl:#ede0ff;--purple-mid:#7c3fbf;
+  --warn:#964219;--warn-hl:#ddcfc6;
+  --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;--radius-full:9999px;
+  --sh-sm:0 1px 2px oklch(0.2 0.01 80/.06);
+  --sh-md:0 4px 12px oklch(0.2 0.01 80/.08);
+  --sh-lg:0 12px 32px oklch(0.2 0.01 80/.12);
+  --ease:180ms cubic-bezier(.16,1,.3,1);
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;
+  --s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;
+  --txs:clamp(.75rem,.7rem + .25vw,.875rem);
+  --tsm:clamp(.875rem,.8rem + .35vw,1rem);
+  --tbase:clamp(1rem,.95rem + .25vw,1.125rem);
+  --tlg:clamp(1.125rem,1rem + .75vw,1.5rem);
+  --txl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --font:"Noto Sans TC",sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#171614;--surface:#1c1b19;--surface2:#201f1d;
+  --surface-off:#1d1c1a;--surface-dyn:#2d2c2a;
+  --border:#393836;--divider:#262523;
+  --text:#cdccca;--muted:#797876;--faint:#5a5957;
+  --primary:#4f98a3;--primary-h:#227f8b;--primary-hl:#1e3033;
+  --success:#6daa45;--success-hl:#1e3018;
+  --gold:#e8af34;--gold-hl:#2a2010;--gold-bright:#f0c040;
+  --purple:#a97fe0;--purple-hl:#2a1840;--purple-mid:#c09ae8;
+  --warn:#bb653b;--warn-hl:#2e1a10;
+  --sh-sm:0 1px 2px oklch(0 0 0/.25);
+  --sh-md:0 4px 12px oklch(0 0 0/.35);
+  --sh-lg:0 12px 32px oklch(0 0 0/.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--font);font-size:var(--tbase);color:var(--text);background:var(--bg);line-height:1.6}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;
+  transition:color var(--ease),background var(--ease),border-color var(--ease),box-shadow var(--ease),transform var(--ease)}
+input{font:inherit;color:inherit}
+svg{display:block}
+
+.app{max-width:660px;margin-inline:auto;padding:var(--s6) var(--s4) var(--s16)}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--s8)}
+.hname{font-size:var(--txl);font-weight:700;color:var(--primary);letter-spacing:-.02em;display:flex;align-items:center;gap:var(--s2)}
+.hsub{font-size:var(--txs);color:var(--muted);margin-top:var(--s1)}
+.header-actions{display:flex;align-items:center;gap:var(--s2);flex-shrink:0}
+.theme-btn,.header-share-btn{width:36px;height:36px;border-radius:var(--radius-full);display:grid;place-items:center;
+  color:var(--muted);border:1px solid oklch(from var(--text) l c h/.12);flex-shrink:0}
+.theme-btn:hover,.header-share-btn:hover{background:var(--surface-dyn);color:var(--text)}
+.header-share-btn{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:var(--sh-sm)}
+.header-share-btn:hover{background:var(--primary-h);color:#fff}
+
+.card{background:var(--surface);border-radius:var(--radius-xl);padding:var(--s6);
+  box-shadow:var(--sh-sm);border:1px solid oklch(from var(--text) l c h/.07);margin-bottom:var(--s4)}
+.step-chip{display:inline-flex;align-items:center;gap:var(--s2);margin-bottom:var(--s4)}
+.step-num{width:22px;height:22px;border-radius:var(--radius-full);background:var(--primary);
+  color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+.step-txt{font-size:var(--txs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.step-line{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s4)}
+.step-line .step-chip{margin-bottom:0}
+.gold-tip{font-size:var(--txs);font-weight:800;color:var(--gold);background:var(--gold-hl);
+  border:1px solid oklch(from var(--gold-bright) l c h/.35);border-radius:var(--radius-full);
+  padding:3px 10px;letter-spacing:.02em;white-space:nowrap}
+.slabel{font-size:var(--txs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:var(--s4)}
+
+/* Weight */
+.weight-row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.wfield{display:flex;flex-direction:column;gap:var(--s2);flex:1;min-width:90px}
+.wlabel{font-size:var(--tsm);color:var(--muted)}
+.numinput{background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius-md);
+  padding:var(--s3) var(--s4);font-size:var(--tlg);font-weight:700;width:100%;text-align:right;
+  transition:border-color var(--ease),box-shadow var(--ease)}
+.numinput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px oklch(from var(--primary) l c h/.15)}
+.wunit{font-size:var(--tbase);color:var(--muted);align-self:flex-end;padding-bottom:var(--s3);font-weight:600}
+.diff-pill{display:inline-flex;align-items:center;gap:var(--s2);background:var(--primary-hl);
+  color:var(--primary);border-radius:var(--radius-full);padding:var(--s2) var(--s4);
+  font-size:var(--tsm);font-weight:700;white-space:nowrap;margin-top:var(--s4);transition:all .3s ease}
+.diff-pill.warn{background:var(--warn-hl);color:var(--warn)}
+
+/* Inject toggle */
+.inject-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.inject-btn{background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius-lg);
+  padding:var(--s4) var(--s3);text-align:center;cursor:pointer;transition:all var(--ease);
+  display:flex;flex-direction:column;align-items:center;gap:var(--s2)}
+.inject-btn:hover,.inject-btn.active{border-color:var(--primary);background:var(--primary-hl)}
+.inject-btn.active .iname{color:var(--primary)}
+.inject-icon{width:36px;height:36px;border-radius:var(--radius-full);background:var(--surface-off);
+  display:grid;place-items:center;color:var(--muted);transition:background var(--ease),color var(--ease)}
+.inject-btn.active .inject-icon{background:oklch(from var(--primary) l c h/.15);color:var(--primary)}
+.iname{font-size:var(--tsm);font-weight:700}
+.isub{font-size:var(--txs);color:var(--muted)}
+.ibadge{background:var(--gold-bright);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:var(--radius-full);margin-top:2px}
+
+/* Dose */
+.dose-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.dose-btn{background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius-lg);
+  padding:var(--s4) var(--s3);text-align:center;cursor:pointer;transition:all var(--ease)}
+.dose-btn:hover,.dose-btn.active{border-color:var(--primary);background:var(--primary-hl)}
+.dose-btn.active .dtitle{color:var(--primary)}
+.dtitle{font-size:var(--tbase);font-weight:700}
+.dsub{font-size:var(--txs);color:var(--muted);margin-top:var(--s1);line-height:1.5}
+.dprice{font-size:var(--tsm);font-weight:700;color:var(--primary);margin-top:var(--s2)}
+
+/* ── DEPOSIT TIERS ── */
+.deposit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3)}
+.dep-btn{background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius-lg);
+  padding:var(--s4) var(--s3);text-align:center;cursor:pointer;transition:all var(--ease);
+  display:flex;flex-direction:column;align-items:center;gap:var(--s1);position:relative}
+.dep-btn:hover{border-color:var(--purple);background:var(--purple-hl)}
+.dep-btn.active{border-color:var(--purple);background:var(--purple-hl)}
+.dep-btn.active .damt{color:var(--purple)}
+.dep-coins{font-size:18px;margin-bottom:var(--s1)}
+.damt{font-size:var(--tsm);font-weight:700;transition:color var(--ease)}
+.dtier{font-size:var(--txs);color:var(--muted)}
+.dep-prices{display:flex;flex-direction:column;gap:2px;margin-top:var(--s1)}
+.dep-price-row{font-size:11px;color:var(--muted);white-space:nowrap}
+.dep-price-row strong{color:var(--text);font-weight:700}
+.dep-btn.active .dep-price-row{color:var(--purple)}
+.dep-btn.active .dep-price-row strong{color:var(--purple)}
+.dep-btn .save-badge{position:absolute;top:-8px;right:-6px;background:var(--gold-bright);color:#fff;
+  font-size:10px;font-weight:700;padding:1px 6px;border-radius:var(--radius-full);
+  opacity:0;transition:opacity var(--ease)}
+.dep-btn.active .save-badge{opacity:1}
+
+/* No deposit option */
+.nodep-row{margin-top:var(--s3);padding:var(--s3) var(--s4);background:var(--surface-off);
+  border-radius:var(--radius-lg);border:1.5px dashed var(--border);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all var(--ease)}
+.nodep-row:hover{border-color:var(--muted)}
+.nodep-row.active{border-color:var(--primary);background:var(--primary-hl)}
+.nodep-txt{font-size:var(--tsm);color:var(--muted)}
+.nodep-row.active .nodep-txt{color:var(--primary);font-weight:600}
+
+/* Deposit info box */
+.dep-infobox{background:linear-gradient(135deg,var(--purple-hl),var(--gold-hl));
+  border-radius:var(--radius-lg);padding:var(--s4) var(--s5);margin-top:var(--s3);
+  border:1px solid oklch(from var(--purple) l c h/.25);display:none}
+.dep-infobox.show{display:block}
+.dep-info-title{font-size:var(--tsm);font-weight:700;color:var(--purple);margin-bottom:var(--s2)}
+.dep-info-rows{display:flex;flex-direction:column;gap:var(--s1)}
+.dep-info-row{display:flex;justify-content:space-between;font-size:var(--txs);
+  padding:var(--s1) 0;border-bottom:1px solid oklch(from var(--purple) l c h/.1)}
+.dep-info-row:last-child{border-bottom:none;font-weight:700}
+.dep-info-row span:last-child{font-weight:700;color:var(--purple)}
+.deposit-reminder{margin-top:var(--s3);font-size:var(--txs);line-height:1.6;color:var(--warn);
+  background:var(--warn-hl);border:1px solid oklch(from var(--warn) l c h/.22);
+  border-radius:var(--radius-lg);padding:var(--s3) var(--s4);font-weight:600}
+
+/* Rec banner */
+.rec-banner{border-radius:var(--radius-lg);padding:var(--s4) var(--s5);margin-bottom:var(--s3);
+  border:1.5px solid;display:flex;align-items:flex-start;gap:var(--s3)}
+.rec-banner.offer{background:var(--gold-hl);border-color:oklch(from var(--gold-bright) l c h/.45)}
+.rec-banner.normal{background:var(--primary-hl);border-color:oklch(from var(--primary) l c h/.3)}
+.rec-banner.deposit{background:var(--purple-hl);border-color:oklch(from var(--purple) l c h/.35)}
+.rec-icon{flex-shrink:0;margin-top:2px}
+.rec-title{font-size:var(--tsm);font-weight:700}
+.rec-desc{font-size:var(--txs);color:var(--muted);margin-top:var(--s1);line-height:1.6}
+
+/* Result */
+.result-card{border-radius:var(--radius-xl);padding:var(--s6);color:#fff;
+  margin-bottom:var(--s4);box-shadow:var(--sh-md);
+  background:var(--primary);transition:background .4s ease}
+.result-card.special{background:linear-gradient(135deg,#7a5900,#b07a00,#d19900)}
+.result-card.deposit-mode{background:linear-gradient(135deg,var(--purple),var(--purple-mid),#9c59d1)}
+.rl{font-size:var(--txs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.75;margin-bottom:var(--s2)}
+.rtotal{font-size:var(--txl);font-weight:700;letter-spacing:-.02em}
+.rsub{font-size:var(--tsm);opacity:.8;margin-top:var(--s2)}
+.rtags{display:flex;gap:var(--s2);margin-top:var(--s3);flex-wrap:wrap}
+.rtag{background:rgba(255,255,255,.2);border-radius:var(--radius-full);padding:2px 10px;font-size:11px;font-weight:600}
+.rdeposit{margin-top:var(--s3);background:rgba(255,255,255,.15);border-radius:var(--radius-lg);
+  padding:var(--s3) var(--s4);display:none}
+.rdeposit.show{display:block}
+.rd-title{font-size:var(--txs);font-weight:700;opacity:.8;margin-bottom:var(--s2)}
+.rd-rows{display:flex;flex-direction:column;gap:4px}
+.rd-row{display:flex;justify-content:space-between;font-size:var(--txs);opacity:.9}
+.rd-row strong{opacity:1}
+
+/* Breakdown */
+.breakdown{display:flex;flex-direction:column;gap:var(--s2)}
+.brow{display:flex;justify-content:space-between;align-items:center;
+  padding:var(--s3) var(--s4);background:var(--surface2);border-radius:var(--radius-md)}
+.brow.total{background:var(--primary-hl);font-weight:700}
+.brow.savings{background:var(--success-hl)}
+.brow.gold{background:var(--gold-hl)}
+.brow.purple{background:var(--purple-hl)}
+.brow.deposit-in{background:linear-gradient(90deg,var(--purple-hl),var(--gold-hl))}
+.bname{font-size:var(--tsm);color:var(--muted)}
+.bval{font-size:var(--tsm);font-weight:700;color:var(--text)}
+.brow.total .bname,.brow.total .bval{color:var(--primary)}
+.brow.savings .bname,.brow.savings .bval{color:var(--success)}
+.brow.gold .bname,.brow.gold .bval{color:var(--gold)}
+.brow.purple .bname,.brow.purple .bval{color:var(--purple)}
+
+/* Timeline */
+.tl{display:flex;flex-direction:column;gap:var(--s3)}
+.trow{display:flex;gap:var(--s3);align-items:flex-start}
+.tdot{width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px}
+.tphase{font-size:var(--tsm);font-weight:700}
+.tdetail{font-size:var(--txs);color:var(--muted);line-height:1.5}
+
+.note{font-size:var(--txs);color:var(--muted);line-height:1.6;padding:var(--s3) var(--s4);
+  background:var(--surface-off);border-radius:var(--radius-md);border-left:3px solid var(--primary);margin-top:var(--s4)}
+.clinic-card{background:linear-gradient(135deg,var(--surface) 0%,var(--surface-off) 100%);
+  border:1px solid oklch(from var(--primary) l c h/.14);border-radius:var(--radius-2xl);
+  overflow:hidden;box-shadow:var(--sh-sm);margin-top:var(--s6)}
+.clinic-media{background:#f7f3ec}
+.clinic-media img{width:100%;display:block;height:auto}
+.clinic-body{padding:var(--s6)}
+.clinic-kicker{font-size:var(--txs);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:var(--s2)}
+.clinic-title{font-size:var(--tlg);font-weight:900;color:var(--primary);letter-spacing:-.03em;margin-bottom:var(--s2)}
+.clinic-subtitle{font-size:var(--tsm);font-weight:700;color:var(--text);margin-bottom:var(--s4)}
+.clinic-grid{display:grid;grid-template-columns:1fr;gap:var(--s3);margin-top:var(--s4)}
+.clinic-item{display:flex;gap:var(--s3);align-items:flex-start;font-size:var(--txs);line-height:1.55;color:var(--muted)}
+.clinic-item strong{display:block;color:var(--text);font-size:var(--tsm);margin-bottom:2px}
+.clinic-icon{width:28px;height:28px;border-radius:var(--radius-full);background:var(--primary);color:#fff;
+  display:grid;place-items:center;flex-shrink:0;font-size:13px;font-weight:800}
+.clinic-services{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s4)}
+.clinic-pill{font-size:var(--txs);font-weight:700;color:var(--primary);background:var(--primary-soft);
+  border:1px solid oklch(from var(--primary) l c h/.18);border-radius:var(--radius-full);padding:6px 10px}
+.clinic-note{font-size:var(--txs);line-height:1.6;color:var(--muted);margin-top:var(--s4);
+  padding:var(--s3) var(--s4);background:var(--surface);border-radius:var(--radius-lg)}
+.memory-panel{background:var(--surface);border:1px solid oklch(from var(--text) l c h/.08);
+  border-radius:var(--radius-xl);padding:var(--s5);box-shadow:var(--sh-sm);margin:var(--s6) 0 var(--s3)}
+.memory-title{font-size:var(--tsm);font-weight:700;color:var(--primary);display:flex;align-items:center;gap:var(--s2)}
+.memory-desc{font-size:var(--txs);color:var(--muted);line-height:1.6;margin-top:var(--s2)}
+.memory-actions{display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4)}
+.memory-btn{display:flex;align-items:center;justify-content:center;gap:var(--s2);padding:10px 16px;
+  border-radius:var(--radius-full);font-size:var(--txs);font-weight:700;border:1.5px solid var(--primary)}
+.memory-btn.primary{background:var(--primary);color:#fff;box-shadow:var(--sh-sm)}
+.memory-btn.secondary{background:var(--surface2);color:var(--primary)}
+.memory-status{font-size:var(--txs);color:var(--success);min-height:20px;margin-top:var(--s2)}
+.footer{text-align:center;padding:var(--s8) 0 var(--s4);color:var(--faint);font-size:var(--txs)}
+
+@keyframes pop{0%{transform:scale(.93);opacity:.6}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.34,1.56,.64,1) both}
+
+@media(max-width:480px){
+  .deposit-grid{gap:var(--s2)}
+  .dep-btn{padding:var(--s3) var(--s2)}
+  .dep-btn .dep-price-row{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="hname">
+        <svg aria-hidden="true" width="26" height="26" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary)">
+          <circle cx="14" cy="14" r="12"/>
+          <path d="M8 19L8 10L12.5 15L17 10L17 19" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="20" y1="10" x2="20" y2="19" stroke-linecap="round"/>
+          <line x1="18" y1="14.5" x2="22" y2="14.5" stroke-linecap="round"/>
+        </svg>
+        週纖達費用試算
+      </div>
+      <div class="hsub">輸入目標體重，自動推薦最划算方案</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-share-btn" onclick="copyShareLink()" aria-label="分享試算結果給客戶">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+      <button class="theme-btn" id="themeBtn" aria-label="切換深色模式"></button>
+    </div>
+  </div>
+
+  <!-- Step 1: Weight -->
+  <div class="card">
+    <div class="step-chip"><div class="step-num">1</div><div class="step-txt">設定目標體重</div></div>
+    <div class="weight-row">
+      <div class="wfield">
+        <div class="wlabel">目前體重</div>
+        <input class="numinput" type="number" id="cw" value="75" min="40" max="200" step="0.5">
+      </div>
+      <div class="wunit">kg</div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--faint);flex-shrink:0">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      <div class="wfield">
+        <div class="wlabel">目標體重</div>
+        <input class="numinput" type="number" id="tw" value="65" min="40" max="200" step="0.5">
+      </div>
+      <div class="wunit">kg</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:var(--s3);margin-top:var(--s4)">
+      <span style="font-size:var(--tsm);color:var(--muted)">目標減去</span>
+      <span class="diff-pill" id="diffPill">▼ 10.0 公斤</span>
+    </div>
+  </div>
+
+  <!-- Step 2: Injection mode -->
+  <div class="card">
+    <div class="step-chip"><div class="step-num">2</div><div class="step-txt">施打方式</div></div>
+    <div class="inject-grid">
+      <button class="inject-btn" id="btnSelf" onclick="setInject('self')">
+        <div class="inject-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/><path d="M16.5 3.5l4 4L7 21l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <div class="iname">自行施打</div>
+        <div class="isub">居家注射<br>A 方案</div>
+        <span class="ibadge">省管理費</span>
+      </button>
+      <button class="inject-btn active" id="btnDoc" onclick="setInject('doctor')">
+        <div class="inject-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <div class="iname">醫師施打</div>
+        <div class="isub">每週回診<br>B 方案</div>
+      </button>
+    </div>
+
+    <!-- Management fee breakdown per plan -->
+    <div id="mgmtDetail" style="margin-top:var(--s4);display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)">
+      <!-- A plan detail -->
+      <div id="mgmtA" style="border-radius:var(--radius-lg);padding:var(--s4);border:1.5px solid var(--border);background:var(--surface-off);transition:all var(--ease)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)">
+          <span style="font-size:var(--tsm);font-weight:700;color:var(--primary)">A方案 管理費</span>
+          <span id="mgmtAPrice" style="font-size:var(--tsm);font-weight:700;color:var(--primary)">$3,000</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--s2)">
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)">抽血檢測 <strong style="color:var(--text)">1 次</strong>（起始安全性評估）</span>
+          </div>
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)">院長專業諮詢 <strong style="color:var(--text)">2 次</strong>面對面看診（自行預約時間）</span>
+          </div>
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)">每週不限劑量，<strong style="color:var(--text)">自行居家施打</strong></span>
+          </div>
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)"><strong style="color:var(--text)">InBody 量測每月 1 次</strong>（請自行預約回診）</span>
+          </div>
+        </div>
+      </div>
+      <!-- B plan detail -->
+      <div id="mgmtB" style="border-radius:var(--radius-lg);padding:var(--s4);border:1.5px solid var(--primary);background:var(--primary-hl);transition:all var(--ease)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)">
+          <span style="font-size:var(--tsm);font-weight:700;color:var(--primary)">B方案 管理費</span>
+          <span id="mgmtBPrice" style="font-size:var(--tsm);font-weight:700;color:var(--primary)">$6,000</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--s2)">
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)">抽血檢測 <strong style="color:var(--text)">2 次</strong>（起始＋期末成效對比）</span>
+          </div>
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)">院長<strong style="color:var(--text)">每週回診</strong>指導，專業追蹤</span>
+          </div>
+          <div style="display:flex;gap:var(--s2);align-items:flex-start">
+            <span style="color:var(--primary);flex-shrink:0;margin-top:2px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span style="font-size:var(--txs);color:var(--muted)"><strong style="color:var(--text)">院長親自施打</strong>＋<strong style="color:var(--text)">InBody 量測每月 1 次</strong>與數據分析</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Product spec -->
+  <div class="card" id="doseCard">
+    <div class="step-chip"><div class="step-num">3</div><div class="step-txt">藥品規格</div></div>
+    <div class="dose-grid">
+      <button class="dose-btn active" id="dose24btn" onclick="setDose('2.4mg')" style="grid-column:1/-1">
+        <div class="dtitle">2.4mg 規格</div>
+        <div class="dsub">使用 3 個月<br>約減 5 公斤</div>
+        <div class="dprice" id="p24">每盒 $17,990</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3.5: Manual boxes -->
+  <div class="card">
+    <div class="step-line">
+      <div class="step-chip"><div class="step-num">4</div><div class="step-txt">購買盒數（可自行調整）</div></div>
+      <span class="gold-tip">買四盒最划算</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:var(--s3)">
+        <button onclick="adjustBoxes(-1)" style="width:40px;height:40px;border-radius:var(--radius-full);border:1.5px solid var(--border);background:var(--surface2);font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0">−</button>
+        <input id="boxesInput" type="number" min="1" max="20" value="1"
+          style="width:72px;text-align:center;padding:10px 8px;border:1.5px solid var(--primary);border-radius:var(--radius-lg);background:var(--surface2);color:var(--text);font-size:var(--tlg);font-weight:700;font-family:inherit"
+          oninput="setBoxesManual(this.value)">
+        <button onclick="adjustBoxes(1)" style="width:40px;height:40px;border-radius:var(--radius-full);border:1.5px solid var(--border);background:var(--surface2);font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0">＋</button>
+        <span style="font-size:var(--tsm);color:var(--muted)">盒</span>
+      </div>
+      <div id="boxesHint" style="font-size:var(--txs);color:var(--muted);line-height:1.5"></div>
+    </div>
+    <div style="margin-top:var(--s3);font-size:var(--txs);color:var(--muted)">
+      💡 留空或設為 0 則依目標體重自動計算
+    </div>
+  </div>
+
+  <!-- Step 4: Deposit tier -->
+  <div class="card">
+    <div class="step-chip"><div class="step-num">5</div><div class="step-txt">儲值方案（越存越划算）</div></div>
+    <div style="margin-bottom:var(--s4)">
+      <label style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:var(--txs);color:var(--muted)">之前累計已花費（NT$）</span>
+        <input id="prevSpent" type="number" min="0" step="1000" value="0" placeholder="例如 50000"
+          style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-lg);background:var(--surface2);color:var(--text);font-size:var(--tsm);font-family:inherit"
+          oninput="S.prevSpent=Math.max(0,Number(this.value)||0);calculate()">
+      </label>
+    </div>
+    <div class="deposit-grid">
+      <!-- 3萬 -->
+      <button class="dep-btn" id="dep3" onclick="setDeposit(50000)">
+        <span class="save-badge">標準</span>
+        <div class="dep-coins">💰</div>
+        <div class="damt">儲值 5 萬</div>
+        <div class="dtier">基本方案</div>
+        <div class="dep-prices">
+          <div class="dep-price-row">2.4mg <strong>$17,500</strong></div>
+        </div>
+      </button>
+      <!-- 6萬 -->
+      <button class="dep-btn" id="dep6" onclick="setDeposit(100000)">
+        <span class="save-badge">推薦</span>
+        <div class="dep-coins">💰💰</div>
+        <div class="damt">儲值 10 萬</div>
+        <div class="dtier">優惠方案</div>
+        <div class="dep-prices">
+          <div class="dep-price-row">2.4mg <strong>$16,900</strong></div>
+        </div>
+      </button>
+      <!-- 9萬 -->
+      <button class="dep-btn" id="dep9" onclick="setDeposit(150000)">
+        <span class="save-badge">最優惠</span>
+        <div class="dep-coins">💰💰💰</div>
+        <div class="damt">儲值 15 萬</div>
+        <div class="dtier">VIP 方案</div>
+        <div class="dep-prices">
+          <div class="dep-price-row">2.4mg <strong>$15,900</strong></div>
+        </div>
+      </button>
+    </div>
+    <!-- No deposit option -->
+    <div class="nodep-row active" id="depNone" onclick="setDeposit(0)">
+      <span class="nodep-txt">不儲值，使用一般定價</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--faint)">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+
+    <!-- Deposit info breakdown -->
+    <div class="dep-infobox" id="depInfo">
+      <div class="dep-info-title" id="depInfoTitle">💜 儲值方案說明</div>
+      <div class="dep-info-rows" id="depInfoRows"></div>
+    </div>
+    <div class="deposit-reminder">儲值金額扣除後若有剩餘，可轉為醫美及其他療程金額使用，不支援退款。</div>
+  </div>
+
+  <!-- Smart Rec Banner -->
+  <div id="recBanner" style="display:none"></div>
+
+  <!-- Result -->
+  <div class="result-card" id="resultCard">
+    <div class="rl" id="resultLabel">💰 預估總費用</div>
+    <div class="rtotal" id="resultTotal">$0</div>
+    <div class="rsub" id="resultSub">計算中…</div>
+    <div class="rtags" id="resultTags"></div>
+    <!-- Deposit breakdown inside result card -->
+    <div class="rdeposit" id="rdeposit">
+      <div class="rd-title">📊 儲值帳戶試算</div>
+      <div class="rd-rows" id="rdRows"></div>
+    </div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="card">
+    <div class="slabel">費用明細</div>
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="card">
+    <div class="slabel">療程規劃</div>
+    <div class="tl" id="timeline"></div>
+    <div class="note">⚕️ 以週纖達 2.4mg 使用 3 個月減約 5 公斤為估算基準。儲值餘額可累積使用，不限療程次數。實際療程由醫師評估，本試算為費用參考，非醫療效果保證。</div>
+  </div>
+
+  <section class="clinic-card" aria-label="府中讚美診所簡介">
+    <div class="clinic-media">
+      <img src="clinic-intro.jpeg" alt="府中讚美診所院長胡定煒醫師、地址電話與服務項目介紹">
+    </div>
+    <div class="clinic-body">
+      <div class="clinic-kicker">Clinic Introduction</div>
+      <div class="clinic-title">府中讚美診所</div>
+      <div class="clinic-subtitle">專業醫美，由內而外綻放自信之美</div>
+      <div class="clinic-grid">
+        <div class="clinic-item"><div class="clinic-icon">醫</div><div><strong>院長胡定煒醫師</strong>專業醫師親自諮詢，依照個人狀態規劃合適療程。</div></div>
+        <div class="clinic-item"><div class="clinic-icon">址</div><div><strong>板橋區府中路 60 號 1 樓</strong>鄰近府中商圈，交通便利，方便回診追蹤。</div></div>
+        <div class="clinic-item"><div class="clinic-icon">電</div><div><strong>02-2272-0168</strong>歡迎來電或透過 LINE 預約專屬美麗計畫。</div></div>
+        <div class="clinic-item"><div class="clinic-icon">時</div><div><strong>週一至週六 14:00–20:30</strong>提供彈性時段，方便安排諮詢與療程。</div></div>
+      </div>
+      <div class="clinic-services">
+        <span class="clinic-pill">皮膚治療</span>
+        <span class="clinic-pill">雷射美容</span>
+        <span class="clinic-pill">體重管理</span>
+        <span class="clinic-pill">專業醫美團隊</span>
+        <span class="clinic-pill">安心醫療環境</span>
+      </div>
+      <div class="clinic-note">立即預約諮詢，讓專業團隊協助您完成客製化療程規劃；本費用試算僅供初步參考，實際方案仍以醫師評估與現場說明為準。</div>
+    </div>
+  </section>
+
+<div class="memory-panel">
+  <div class="memory-title" id="memoryTitle">正在準備記憶設定…</div>
+  <div class="memory-desc" id="memoryDesc">系統會記住這一頁的體重、方案、盒數、儲值與停留位置。</div>
+  <div class="memory-actions">
+    <button class="memory-btn primary" onclick="copyMemoryLink()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      複製我的記憶連結
+    </button>
+    <button class="memory-btn secondary" onclick="copyShareLink()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      分享此試算結果給客戶
+    </button>
+  </div>
+  <div class="memory-status" id="shareCopied"></div>
+</div>
+<div class="footer">健康管理中心 · 儲值越多越划算</div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────────────
+// DATA
+// ──────────────────────────────────────────────────────────────
+const DRUG = {
+  "2.4mg": { kgPerBox:5, months:3, mgPerBox:2.4,
+             price:{ 0:17990, 50000:17500, 100000:16900, 150000:15900 }, clinicCost:0 }
+};
+
+const PLANS = {
+  A:{ name:"A方案 Starter",  mgmt:3000 },
+  B:{ name:"B方案 Precision",mgmt:6000 }
+};
+
+// Deposit tiers
+const DEP_TIERS = [
+  { val:0,      label:"不儲值",   coins:"",         tag:"" },
+  { val:50000,  label:"儲值5萬",  coins:"💰",       tag:"標準" },
+  { val:100000, label:"儲值10萬", coins:"💰💰",     tag:"推薦" },
+  { val:150000, label:"儲值15萬", coins:"💰💰💰",   tag:"最優惠" }
+];
+
+// ──────────────────────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────────────────────
+let S = { inject:"doctor", dose:"2.4mg", deposit:0, prevSpent:0, boxes:0 };
+
+// ──────────────────────────────────────────────────────────────
+// SETTERS
+// ──────────────────────────────────────────────────────────────
+function setInject(m){
+  S.inject = m;
+  document.getElementById("btnSelf").classList.toggle("active",m==="self");
+  document.getElementById("btnDoc").classList.toggle("active",m==="doctor");
+  // Highlight active plan detail
+  const mA = document.getElementById("mgmtA");
+  const mB = document.getElementById("mgmtB");
+  if(m==="self"){
+    mA.style.borderColor="var(--primary)"; mA.style.background="var(--primary-hl)";
+    mB.style.borderColor="var(--border)";  mB.style.background="var(--surface-off)";
+  } else {
+    mB.style.borderColor="var(--primary)"; mB.style.background="var(--primary-hl)";
+    mA.style.borderColor="var(--border)";  mA.style.background="var(--surface-off)";
+  }
+  calculate();
+}
+function setDose(d){
+  S.dose = "2.4mg";
+  const btn = document.getElementById("dose24btn");
+  if(btn) btn.classList.add("active");
+  calculate();
+}
+function setBoxesManual(v){
+  const n = parseInt(v)||0;
+  S.boxes = n >= 1 ? n : 0;
+  calculate();
+}
+function adjustBoxes(delta){
+  const inp = document.getElementById("boxesInput");
+  const cur = parseInt(inp.value)||1;
+  const next = Math.max(1, cur+delta);
+  inp.value = next;
+  S.boxes = next;
+  calculate();
+}
+function setDeposit(v){
+  S.deposit = v;
+  // update button states
+  [0,50000,100000,150000].forEach(t=>{
+    const idMap = {0:"depNone",50000:"dep3",100000:"dep6",150000:"dep9"};
+    const el = document.getElementById(idMap[t]);
+    if(el) el.classList.toggle("active",t===v);
+  });
+  // show/hide info box
+  const infoBox = document.getElementById("depInfo");
+  if(v > 0){
+    infoBox.classList.add("show");
+    renderDepositInfo(v);
+  } else {
+    infoBox.classList.remove("show");
+  }
+  calculate();
+}
+
+function renderDepositInfo(v){
+  const d24 = DRUG["2.4mg"].price[v];
+  const tierLabel = DEP_TIERS.find(t=>t.val===v)?.label || "";
+  document.getElementById("depInfoTitle").textContent = "💜 " + tierLabel + " 藥品折扣價";
+  document.getElementById("depInfoRows").innerHTML = `
+    <div class="dep-info-row"><span>週纖達 2.4mg／盒</span><span>$${d24.toLocaleString()}</span></div>
+    <div class="dep-info-row"><span>儲值餘額</span><span>$${v.toLocaleString()}（可累積使用）</span></div>
+    <div class="dep-info-row"><span>相較不儲值每盒省</span><span>$${(17990-d24).toLocaleString()}</span></div>
+  `;
+}
+
+// ──────────────────────────────────────────────────────────────
+// CALCULATE
+// ──────────────────────────────────────────────────────────────
+function calculate(){
+  const cw = parseFloat(document.getElementById("cw").value)||0;
+  const tw = parseFloat(document.getElementById("tw").value)||0;
+  const diff = Math.max(0,parseFloat((cw-tw).toFixed(1)));
+
+  const pill = document.getElementById("diffPill");
+  pill.textContent = diff>0 ? "▼ "+diff.toFixed(1)+" 公斤" : "請設定有效目標";
+  pill.className = "diff-pill"+(diff<=0?" warn":"");
+
+  if(diff<=0){ renderEmpty(); return; }
+
+  const autoPlan = S.inject==="self"?"A":"B";
+  const drug = DRUG[S.dose];
+  const pricePerBox = drug.price[S.deposit] || drug.price[0];
+  const autoBoxes = Math.ceil(diff/drug.kgPerBox);
+  const boxesNeeded = (S.boxes >= 1) ? S.boxes : autoBoxes;
+  // Sync input display
+  const bInp = document.getElementById("boxesInput");
+  if(bInp && S.boxes < 1) bInp.value = autoBoxes;
+  // Update hint
+  const bHint = document.getElementById("boxesHint");
+  if(bHint){
+    const estKg = (boxesNeeded * drug.kgPerBox).toFixed(1);
+    bHint.innerHTML = S.boxes>=1
+      ? `手動設定 <strong>${boxesNeeded} 盒</strong>，可減約 <strong>${estKg} 公斤</strong>`
+      : `依目標自動計算：<strong>${autoBoxes} 盒</strong>，約減 <strong>${estKg} 公斤</strong>`;
+  }
+
+  // Update product price for this deposit tier
+  document.getElementById("p24").textContent = "每盒 $"+DRUG["2.4mg"].price[S.deposit||0].toLocaleString();
+
+  let mgmt, totalDrug, grandTotal, depSavings=0;
+  const totalMonths = boxesNeeded * drug.months;
+
+  // 管理費規則：
+  // A方案：儲值或4盒以上 → 免管理費
+  // B方案：儲值或4盒以上 → 管理費88折
+  const normalMgmt = PLANS[autoPlan].mgmt;
+  if(S.inject === "self" && (boxesNeeded >= 4 || S.deposit > 0)){
+    mgmt = 0;
+  } else if(S.inject === "doctor" && (boxesNeeded >= 4 || S.deposit > 0)){
+    mgmt = Math.round(normalMgmt * 0.88);
+  } else {
+    mgmt = normalMgmt;
+  }
+  totalDrug = boxesNeeded * pricePerBox;
+  const dispMgmtA = (S.deposit>0 || boxesNeeded>=4) ? "$0 免管理費 🎉" : "$3,000";
+  const dispMgmtB = (S.deposit>0 || boxesNeeded>=4) ? "$"+(Math.round(6000*0.88)).toLocaleString()+" (88折)" : "$6,000";
+  const elMA = document.getElementById("mgmtAPrice");
+  const elMB = document.getElementById("mgmtBPrice");
+  if(elMA) elMA.textContent = dispMgmtA;
+  if(elMB) elMB.textContent = dispMgmtB;
+  grandTotal = mgmt + totalDrug;
+  if(S.deposit>0 || boxesNeeded>=4){
+    const normalDrug = boxesNeeded * DRUG[S.dose].price[0];
+    depSavings = Math.max(0, (normalMgmt + normalDrug) - grandTotal);
+  }
+
+  const perKg = diff>0 ? Math.round(grandTotal/diff) : 0;
+
+  // ── Result card ──
+  const rc = document.getElementById("resultCard");
+  rc.className = "result-card" + (S.deposit>0?" deposit-mode":"");
+  document.getElementById("resultLabel").textContent = S.deposit>0 ? "💜 儲值方案總費用" : "💰 預估總費用";
+
+  const tel = document.getElementById("resultTotal");
+  tel.classList.remove("pop"); void tel.offsetWidth;
+  tel.textContent = "$"+grandTotal.toLocaleString();
+  tel.classList.add("pop");
+
+  document.getElementById("resultSub").textContent =
+    "減 "+diff.toFixed(1)+" 公斤 ｜ 平均每公斤 $"+perKg.toLocaleString()
+    + (
+        (S.inject==="self" && (boxesNeeded>=4||S.deposit>0)) ? " ｜ 管理費免費" :
+        (S.inject==="doctor" && (boxesNeeded>=4||S.deposit>0)) ? " ｜ 管理費88折" : ""
+      );
+
+  const tags=[];
+  tags.push(S.inject==="self"?"A方案":"B方案", boxesNeeded+"盒"+S.dose, totalMonths+"個月");
+  if(S.deposit>0) tags.push(DEP_TIERS.find(t=>t.val===S.deposit).label);
+  if(boxesNeeded>=4) tags.push("四盒優惠");
+  document.getElementById("resultTags").innerHTML = tags.map(t=>`<span class="rtag">${t}</span>`).join("");
+
+  // Deposit breakdown inside result card
+  const rdep = document.getElementById("rdeposit");
+  if(S.deposit>0){
+    rdep.classList.add("show");
+    const remaining = S.deposit - grandTotal;
+    const prevSpent = Math.max(0, S.prevSpent||0);
+    const cumulativeSpend = prevSpent + grandTotal;
+    document.getElementById("rdRows").innerHTML = `
+      <div class="rd-row"><span>儲值總額</span><strong>$${S.deposit.toLocaleString()}</strong></div>
+      <div class="rd-row"><span>管理費</span><strong style="color:rgba(255,255,255,.9)">${
+        mgmt===0 ? "$0 免費 🎉" :
+        (S.inject==="doctor"&&S.deposit>0) ? "$"+mgmt.toLocaleString()+" (88折)" :
+        "$"+mgmt.toLocaleString()
+      }</strong></div>
+      <div class="rd-row"><span>本次藥費</span><strong>$${totalDrug.toLocaleString()}</strong></div>
+      <div class="rd-row"><span>本次合計</span><strong>$${grandTotal.toLocaleString()}</strong></div>
+      <div class="rd-row" style="border-top:1px solid rgba(255,255,255,.2);margin-top:4px;padding-top:8px"><span>之前累計已花費</span><strong>$${prevSpent.toLocaleString()}</strong></div>
+      <div class="rd-row"><span>🏆 累計總支出（含本次）</span><strong>$${cumulativeSpend.toLocaleString()}</strong></div>
+      ${depSavings>0?`<div class="rd-row"><span>💚 本次省下</span><strong>$${depSavings.toLocaleString()}</strong></div>`:""}
+    `;
+  } else {
+    rdep.classList.remove("show");
+  }
+
+  // ── Rec banner ──
+  const banner = document.getElementById("recBanner");
+  if(S.deposit>0){
+    banner.style.display="flex"; banner.className="rec-banner deposit";
+    const tier = DEP_TIERS.find(t=>t.val===S.deposit);
+    banner.innerHTML=`<svg class="rec-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>
+    <div><div class="rec-title" style="color:var(--purple)">💜 ${tier.label}：${S.inject==="self"?"管理費全免":"管理費88折"} ＋ 藥費折扣！</div>
+    <div class="rec-desc">${S.inject==="self"?"✅ <strong>管理費 $0 免費</strong>":"✅ <strong>管理費 88折優惠</strong>"}<br>✅ 每盒 2.4mg 優惠至 <strong>$${DRUG["2.4mg"].price[S.deposit].toLocaleString()}</strong><br>✅ 儲值餘額可累積，不限療程次數<br>${depSavings>0?"本次共省下 <strong>$"+depSavings.toLocaleString()+"</strong>":""}。</div></div>`;
+  } else if(boxesNeeded>=4){
+    banner.style.display="flex"; banner.className="rec-banner offer";
+    banner.innerHTML=`<svg class="rec-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold-bright)" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    <div><div class="rec-title" style="color:var(--gold)">買四盒最划算</div>
+    <div class="rec-desc">${S.inject==="self"?"A方案四盒以上管理費免費":"B方案四盒以上管理費 88 折"}，共需 <strong>${boxesNeeded} 盒 2.4mg</strong>，療程約 <strong>${totalMonths} 個月</strong>。</div></div>`;
+  } else if(S.inject==="self"){
+    banner.style.display="flex"; banner.className="rec-banner normal";
+    banner.innerHTML=`<svg class="rec-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div><div class="rec-title" style="color:var(--primary)">✅ 自動套用 A 方案</div>
+    <div class="rec-desc">自行施打選 A 方案，共需 <strong>${boxesNeeded} 盒 ${S.dose}</strong>，療程約 <strong>${totalMonths} 個月</strong>。</div></div>`;
+  } else {
+    banner.style.display="flex"; banner.className="rec-banner normal";
+    banner.innerHTML=`<svg class="rec-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    <div><div class="rec-title" style="color:var(--primary)">✅ 自動套用 B 方案</div>
+    <div class="rec-desc">醫師施打選 B 方案，共需 <strong>${boxesNeeded} 盒 ${S.dose}</strong>，療程約 <strong>${totalMonths} 個月</strong>。</div></div>`;
+  }
+
+  // ── Breakdown ──
+  const brows=[];
+  if(S.inject==="self" && boxesNeeded>=4 && S.deposit===0){
+    brows.push({k:"管理服務費（"+PLANS[autoPlan].name+"）",v:"$0 自行施打4盒以上免費 🎉",cls:"savings"});
+  } else if(S.inject==="self" && S.deposit>0){
+    brows.push({k:"管理服務費（"+PLANS[autoPlan].name+"）",v:"$0 儲值免管理費 🎉",cls:"savings"});
+  } else if(S.inject==="doctor" && (boxesNeeded>=4 || S.deposit>0)){
+    const orig = PLANS[autoPlan].mgmt;
+    brows.push({k:"管理服務費（"+PLANS[autoPlan].name+"）88折",v:"$"+mgmt.toLocaleString()+' <span style="text-decoration:line-through;opacity:.5;font-weight:400;font-size:var(--txs)">$'+orig.toLocaleString()+'</span>',cls:"purple"});
+  } else {
+    brows.push({k:"管理服務費（"+PLANS[autoPlan].name+"）",v:"$"+mgmt.toLocaleString()});
+  }
+  brows.push({k:"藥品費 "+boxesNeeded+" 盒 × "+S.dose+(S.deposit>0?" (儲值優惠價)":""),v:"$"+totalDrug.toLocaleString()});
+  if(depSavings>0) brows.push({k:"💜 本次省下（管理費+藥費）",v:"-$"+depSavings.toLocaleString(),cls:"purple"});
+  brows.push({k:"合計 <span style=\"background:#f0e4b8;color:#b07a00;font-size:11px;font-weight:700;padding:1px 8px;border-radius:9999px;margin-left:4px;border:1px solid rgba(176,122,0,.3)\">現金價</span><span style=\"background:#fde2e2;color:#b42318;font-size:11px;font-weight:800;padding:1px 8px;border-radius:9999px;margin-left:4px;border:1px solid rgba(180,35,24,.25)\">可刷卡</span>",v:"$"+grandTotal.toLocaleString(),cls:"total"});
+  if(S.deposit > 0){
+    const remaining = S.deposit - grandTotal;
+    const remText = remaining >= 0
+      ? "$"+remaining.toLocaleString()+" 剩餘"
+      : "需補 $"+Math.abs(remaining).toLocaleString();
+    brows.push({k:"儲值餘額（本次後）",v:remText,cls: remaining>=0 ? "savings" : "purple"});
+  }
+  document.getElementById("breakdown").innerHTML =
+    brows.map(r=>`<div class="brow ${r.cls||''}"><span class="bname">${r.k}</span><span class="bval" style="display:flex;align-items:center;gap:4px">${r.v}</span></div>`).join("");
+
+  // ── Timeline ──
+  const phases=[];
+  phases.push({ph:"第 1–2 週：起始期",detail:"由醫師評估後開始療程，讓身體逐步適應"});
+  if(totalMonths>=2) phases.push({ph:"第 3–8 週：加速減重期",detail:"劑量調升，體重穩定下滑，多數人每週減 0.5–1 公斤"});
+  if(totalMonths>=3) phases.push({ph:"第 9–12 週：維持鞏固期",detail:"以穩定劑量鞏固成果，避免復胖"});
+  if(totalMonths>3)  phases.push({ph:"第 13 週後：延續療程",detail:"繼續下一療程直至達標"});
+  phases.push({ph:"預估 "+boxesNeeded+" 盒，共 "+totalMonths+" 個月",detail:"每盒 "+S.dose+" 約減 "+drug.kgPerBox+" 公斤，歷時 "+drug.months+" 個月"});
+  document.getElementById("timeline").innerHTML =
+    phases.map(p=>`<div class="trow"><div class="tdot"></div><div><div class="tphase">${p.ph}</div><div class="tdetail">${p.detail}</div></div></div>`).join("");
+}
+
+function renderEmpty(){
+  document.getElementById("resultTotal").textContent="—";
+  document.getElementById("resultSub").textContent="請輸入目前及目標體重";
+  document.getElementById("resultTags").innerHTML="";
+  document.getElementById("rdeposit").classList.remove("show");
+  document.getElementById("breakdown").innerHTML=`<div class="brow"><span class="bname" style="color:var(--faint)">等待輸入中…</span><span class="bval">—</span></div>`;
+  document.getElementById("timeline").innerHTML=`<div class="trow"><div class="tdot"></div><div><div class="tphase" style="color:var(--muted)">填入體重後即可看到療程規劃</div></div></div>`;
+  document.getElementById("recBanner").style.display="none";
+}
+
+// ── Shareable URL state persistence ──
+let isHydrating = true;
+let rememberedScrollY = 0;
+let currentThemeMode = matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light";
+const bootTime = Date.now();
+let serverSyncEnabled = false;
+let serverSaveTimer = 0;
+let memoryKey = "";
+let shareOnlyMode = false;
+const API_BASE = location.protocol === "file:" ? "" : (location.origin.includes("localhost") || location.origin.includes("127.0.0.1") ? "" : "__PORT_5000__");
+const PUBLIC_PAGE_URL = "https://fuzhong-wegovy-calculator.netlify.app/";
+
+function createMemoryKey(){
+  const bytes = new Uint8Array(12);
+  if(window.crypto && crypto.getRandomValues){
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, b=>b.toString(16).padStart(2,"0")).join("");
+  }
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+function parseHashState(){
+  const hash = location.hash.slice(1);
+  if(!hash || !hash.includes("=")) return null;
+  const params = {};
+  hash.split("&").forEach(pair=>{
+    const [k,v] = pair.split("=");
+    params[k] = decodeURIComponent(v || "");
+  });
+  return {
+    key: params.k,
+    hasStateParams: ["cw","tw","inj","dose","dep","boxes","ps","sy","th"].some(k=>Object.prototype.hasOwnProperty.call(params,k)),
+    cw: params.cw,
+    tw: params.tw,
+    inject: params.inj,
+    dose: params.dose,
+    deposit: Number(params.dep || 0),
+    boxes: Number(params.boxes || 0),
+    prevSpent: Number(params.ps || 0),
+    scrollY: Number(params.sy || 0),
+    theme: params.th
+  };
+}
+
+async function loadServerState(key){
+  if(!API_BASE && location.protocol === "file:") return null;
+  if(!key) return null;
+  try{
+    const res = await fetch(API_BASE + "/api/state/" + encodeURIComponent(key), { cache:"no-store" });
+    if(!res.ok) return null;
+    const data = await res.json();
+    return data && data.state ? data.state : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function queueServerSave(state){
+  if(!serverSyncEnabled || (!API_BASE && location.protocol === "file:")) return;
+  if(!memoryKey || shareOnlyMode) return;
+  clearTimeout(serverSaveTimer);
+  serverSaveTimer = setTimeout(async()=>{
+    try{
+      await fetch(API_BASE + "/api/state/" + encodeURIComponent(memoryKey), {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ state })
+      });
+    }catch(e){}
+  }, 180);
+}
+
+function buildStateHash(state, includeMemoryKey){
+  const parts = [];
+  if(includeMemoryKey && memoryKey) parts.push("k="+encodeURIComponent(memoryKey));
+  parts.push(
+    "cw="+encodeURIComponent(state.cw),
+    "tw="+encodeURIComponent(state.tw),
+    "inj="+state.inject,
+    "dose="+encodeURIComponent(state.dose),
+    "dep="+state.deposit,
+    "boxes="+state.boxes,
+    "ps="+encodeURIComponent(state.prevSpent),
+    "sy="+state.scrollY,
+    "th="+state.theme
+  );
+  return parts.join("&");
+}
+
+function getPublicBaseUrl(){
+  if(location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:"){
+    return location.origin + location.pathname;
+  }
+  return PUBLIC_PAGE_URL;
+}
+
+function updateMemoryPanel(){
+  const title = document.getElementById("memoryTitle");
+  const desc = document.getElementById("memoryDesc");
+  if(!title || !desc) return;
+  if(shareOnlyMode){
+    title.textContent = "目前是客戶分享試算版";
+    desc.textContent = "這個連結會還原此試算數字，但不會覆蓋任何人的個人記憶設定。若要自己長期使用，請複製「我的記憶連結」。";
+  }else if(memoryKey){
+    title.textContent = "已啟用我的記憶設定";
+    desc.textContent = "關閉網頁後，請用「我的記憶連結」回來，即可保留上次的數字、方案與停留位置；每位使用者都有獨立記憶，不會互相覆蓋。";
+  }else{
+    title.textContent = "正在準備記憶設定…";
+    desc.textContent = "系統會記住這一頁的體重、方案、盒數、儲值與停留位置。";
+  }
+}
+
+function collectState(){
+  const cw = document.getElementById("cw")?.value || "";
+  const tw = document.getElementById("tw")?.value || "";
+  const prevSpent = Math.max(0, Number(document.getElementById("prevSpent")?.value || 0) || 0);
+  const liveScrollY = Math.max(0, Math.round(window.scrollY || 0));
+  const scrollY = (isHydrating || Date.now() - bootTime < 1200)
+    ? Math.max(liveScrollY, rememberedScrollY)
+    : liveScrollY;
+  return {
+    cw,
+    tw,
+    inject: S.inject,
+    dose: S.dose,
+    deposit: S.deposit,
+    boxes: S.boxes,
+    prevSpent,
+    scrollY,
+    theme: currentThemeMode
+  };
+}
+
+function applyState(state){
+  if(!state) return;
+  if(state.cw !== undefined && state.cw !== "") document.getElementById("cw").value = state.cw;
+  if(state.tw !== undefined && state.tw !== "") document.getElementById("tw").value = state.tw;
+
+  const inject = state.inject === "self" ? "self" : state.inject === "doctor" ? "doctor" : S.inject;
+  const dose = "2.4mg";
+  const deposit = [0,50000,100000,150000].includes(Number(state.deposit)) ? Number(state.deposit) : S.deposit;
+  const boxes = Math.max(0, parseInt(state.boxes,10) || 0);
+  const prevSpent = Math.max(0, Number(state.prevSpent) || 0);
+
+  S.inject = inject;
+  S.dose = dose;
+  S.deposit = deposit;
+  S.boxes = boxes;
+  S.prevSpent = prevSpent;
+
+  const boxesInput = document.getElementById("boxesInput");
+  if(boxesInput && boxes >= 1) boxesInput.value = boxes;
+  const prevInput = document.getElementById("prevSpent");
+  if(prevInput) prevInput.value = prevSpent;
+
+  setInject(inject);
+  setDose(dose);
+  setDeposit(deposit);
+
+  if(state.theme === "light" || state.theme === "dark"){
+    currentThemeMode = state.theme;
+    document.documentElement.setAttribute("data-theme", currentThemeMode);
+  }
+  rememberedScrollY = Math.max(0, Number(state.scrollY) || 0);
+}
+
+function saveState(){
+  const state = collectState();
+  const hash = buildStateHash(state, !shareOnlyMode);
+  history.replaceState(null,"","#"+hash);
+  queueServerSave(state);
+}
+
+// Save on every calculation after hydration, without interrupting the initial restore.
+const _origCalc = calculate;
+calculate = function(){
+  _origCalc();
+  if(!isHydrating) saveState();
+};
+
+// ── Theme ──
+(function(){
+  const btn=document.getElementById("themeBtn"),root=document.documentElement;
+  function icon(){
+    root.setAttribute("data-theme",currentThemeMode);
+    btn.setAttribute("aria-label", currentThemeMode==="dark" ? "切換淺色模式" : "切換深色模式");
+    btn.innerHTML=currentThemeMode==="dark"
+    ?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`
+    :`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  }
+  icon();
+  btn.addEventListener("click",()=>{
+    currentThemeMode=currentThemeMode==="dark"?"light":"dark";
+    icon();
+    saveState();
+  });
+})();
+
+// ── Init ──
+["cw","tw"].forEach(id=>document.getElementById(id).addEventListener("input",calculate));
+
+async function initializeApp(){
+  const hashState = parseHashState();
+  memoryKey = hashState?.key || "";
+  const hasShareParams = Boolean(hashState?.hasStateParams);
+  shareOnlyMode = Boolean(hashState && hasShareParams && !memoryKey);
+  if(!memoryKey && !shareOnlyMode) memoryKey = createMemoryKey();
+  const serverState = memoryKey && !hasShareParams ? await loadServerState(memoryKey) : null;
+  const initialState = hasShareParams ? hashState : serverState;
+  serverSyncEnabled = Boolean(memoryKey && !shareOnlyMode);
+
+  if(initialState){
+    applyState(initialState);
+  }else{
+    setInject("doctor");
+    setDose("2.4mg");
+    setDeposit(0);
+  }
+  updateMemoryPanel();
+
+  calculate();
+
+  requestAnimationFrame(()=>{
+    if(rememberedScrollY > 0){
+      window.scrollTo({ top: rememberedScrollY, behavior: "auto" });
+    }
+    setTimeout(()=>{
+      isHydrating = false;
+      saveState();
+    }, 80);
+  });
+}
+
+initializeApp();
+
+let scrollSaveTimer = 0;
+window.addEventListener("scroll",()=>{
+  if(isHydrating) return;
+  clearTimeout(scrollSaveTimer);
+  scrollSaveTimer = setTimeout(saveState, 80);
+},{passive:true});
+window.addEventListener("pagehide",saveState);
+window.addEventListener("beforeunload",saveState);
+
+
+async function copyShareLink(){
+  saveState();
+  const shareHash = buildStateHash(collectState(), false);
+  const url = getPublicBaseUrl() + "#" + shareHash;
+  const shareData = {
+    title: "週纖達減重費用試算",
+    text: "這是您的週纖達減重費用試算結果，點開即可看到方案、盒數與預估費用。",
+    url
+  };
+  if(navigator.share){
+    try{
+      await navigator.share(shareData);
+      const el = document.getElementById("shareCopied");
+      el.textContent = "已開啟手機分享選單，可直接選擇 LINE 傳給客戶。";
+      setTimeout(()=>el.textContent="", 3000);
+      return;
+    }catch(e){
+      if(e && e.name === "AbortError") return;
+    }
+  }
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>{
+      const el = document.getElementById("shareCopied");
+      el.textContent = "此裝置不支援直接分享，已複製客戶試算連結，可貼到 LINE。";
+      setTimeout(()=>el.textContent="", 3000);
+    });
+  } else {
+    const ta = document.createElement("textarea");
+    ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy");
+    document.body.removeChild(ta);
+    const el = document.getElementById("shareCopied");
+    el.textContent = "已複製客戶試算連結，可貼到 LINE。";
+    setTimeout(()=>el.textContent="", 3000);
+  }
+}
+
+function copyMemoryLink(){
+  if(!memoryKey){
+    shareOnlyMode = false;
+    memoryKey = createMemoryKey();
+    serverSyncEnabled = true;
+  }
+  saveState();
+  updateMemoryPanel();
+  const url = getPublicBaseUrl() + "#" + buildStateHash(collectState(), true);
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>{
+      const el = document.getElementById("shareCopied");
+      el.textContent = "已複製我的記憶連結：下次用這個連結開啟，就會回到上次設定畫面。";
+      setTimeout(()=>el.textContent="", 4000);
+    });
+  } else {
+    const ta = document.createElement("textarea");
+    ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy");
+    document.body.removeChild(ta);
+    const el = document.getElementById("shareCopied");
+    el.textContent = "已複製我的記憶連結。";
+    setTimeout(()=>el.textContent="", 4000);
+  }
+}
+
+</script>
+</body>
+</html>
